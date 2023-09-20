@@ -1,0 +1,29 @@
+name: Dataset fetching & preprocessing
+on: [workflow_dispatch]
+jobs:
+  dataset-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: prep dir
+        run: mkdir data && mkdir data/data-storage
+      - name: fetch
+        run: wget https://gist.githubusercontent.com/zeionara/de67f6c5ced7a7b04eac8d6556265e8e/raw/8aac306c985bd9e9e565fd97f4c6ea51c45a7d2c/ratings.csv && mv ratings.csv data/data-storage/ratings.csv
+
+      - name: save to storage
+        uses: actions/upload-artifact@v3
+        with:
+          name: data-storage
+          path: data/data-storage/
+
+
+
+  dataset-label:
+    runs-on: ubuntu-latest
+    needs: dataset-fetch-normalize
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: install requirements
+        run: pip install -r deps/preprocessing.txt
