@@ -18,7 +18,7 @@ jobs:
         run: pip install -r deps/preprocessing.txt
       - name: run script
         env:
-          DATA: "data/data-storage/results.csv"
+          DATA: "data/data-storage/ratings.csv"
           TRAIN_DATA: "data/features/train.csv"
           TEST_DATA: "data/features/test.csv"
           LABELER: "data/models/label_encoder.pkl"
