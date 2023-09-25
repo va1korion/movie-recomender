@@ -1,9 +1,18 @@
 name: Extract features from fetched dataset
 on: [workflow_dispatch]
 jobs:
-  dataset-fetch:
+  dataset-label:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
         uses: actions/checkout@v3
-      
+      - name: prep dir
+        run: mkdir data/models && mkdir data/features
+      - name: install requirements
+        run: pip install -r deps/preprocessing.txt
+      - name: run script
+        env:
+          DATA: "data/data-storage/results.csv"
+          FEATURES: "data/features"
+          LABELER: "data/models/label_encoder.pkl"
+        run: python src/label_data.py
