@@ -17,44 +17,27 @@ jobs:
       - name: install requirements
         run: pip install -r deps/preprocessing.txt
 
-
-  train-forest:
-    runs-on: ubuntu-latest
-    needs: prep
-    steps:
-      - name: run script
+      - name: train Random Forest
         env:
           TRAIN_DATA: "data/features/train.csv"
           MODEL_ARTIFACT: "data/models/forest.pkl"
           MODEL: "RandomForest"
         run: python src/train.py
 
-  train-MLP:
-    runs-on: ubuntu-latest
-    needs: prep
-    steps:
-      - name: run script
+      - name: train MLP
         env:
           TRAIN_DATA: "data/features/train.csv"
           MODEL_ARTIFACT: "data/models/MLP.pkl"
           MODEL: "MLP"
         run: python src/train.py
 
-  train-logistic:
-    runs-on: ubuntu-latest
-    needs: prep
-    steps:
-      - name: run script
+      - name: train logistic regression
         env:
           TRAIN_DATA: "data/features/train.csv"
           MODEL_ARTIFACT: "data/models/logistic.pkl"
           MODEL: "Logistic"
         run: python src/train.py
 
-  upload-models:
-    runs-on: ubuntu-latest
-    needs: [train-logistic, train-MLP, train-forest]
-    steps:
       - name: upload model
         uses: actions/upload-artifact@v3
         with:
