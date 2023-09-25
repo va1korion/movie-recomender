@@ -26,10 +26,10 @@ jobs:
       - name: upload features
         uses: actions/upload-artifact@v3
         with:
-          name: data-storage
+          name: features
           path: data/features/
       - name: upload model
         uses: actions/upload-artifact@v3
         with:
-          name: data-storage
+          name: models
           path: data/models/

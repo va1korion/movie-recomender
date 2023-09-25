@@ -6,11 +6,12 @@ jobs:
     steps:
       - name: checkout repo content
         uses: actions/checkout@v3
-      - name: download
-        uses: actions/download-artifact@v3
+      - name: download features
+        uses: dawidd6/action-download-artifact@v2
         with:
-            name: data-storage
-            path: data/data-storage/
+            workflow: extract_features.yml
+            name: features
+            path: data/features/
       - name: prep dir
         run: mkdir data/models && mkdir data/features
       - name: install requirements
@@ -57,5 +58,5 @@ jobs:
       - name: upload model
         uses: actions/upload-artifact@v3
         with:
-          name: data-storage
+          name: features
           path: data/models/
