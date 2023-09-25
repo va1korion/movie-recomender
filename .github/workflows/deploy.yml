@@ -1,0 +1,8 @@
+name: Deployment
+on: [workflow_dispatch]
+jobs:
+  dataset-fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
