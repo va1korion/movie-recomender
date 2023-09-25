@@ -7,7 +7,7 @@ import os
 
 
 train_name = os.environ.get("TRAIN_DATA", default="data/features/train.csv")
-saveto = os.environ.get("MODEL_ARTIFACT", default="data/models/best_model.pkl")
+saveto = os.environ.get("MODEL_ARTIFACT", default="data/models/default_model.pkl")
 model = os.environ.get("MODEL", default="RandomForest")
 
 
