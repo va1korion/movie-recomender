@@ -1,8 +1,61 @@
-name: Dataset fetching & preprocessing
+name: Train models
 on: [workflow_dispatch]
 jobs:
-  dataset-fetch:
+  prep:
     runs-on: ubuntu-latest
     steps:
       - name: checkout repo content
         uses: actions/checkout@v3
+      - name: download
+        uses: actions/download-artifact@v3
+        with:
+            name: data-storage
+            path: data/data-storage/
+      - name: prep dir
+        run: mkdir data/models && mkdir data/features
+      - name: install requirements
+        run: pip install -r deps/preprocessing.txt
+
+
+  train-forest:
+    runs-on: ubuntu-latest
+    needs: prep
+    steps:
+      - name: run script
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/forest.pkl"
+          MODEL: "RandomForest"
+        run: python src/label_data.py
+
+  train-MLP:
+    runs-on: ubuntu-latest
+    needs: prep
+    steps:
+      - name: run script
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/MLP.pkl"
+          MODEL: "MLP"
+        run: python src/label_data.py
+
+  train-logistic:
+    runs-on: ubuntu-latest
+    needs: prep
+    steps:
+      - name: run script
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/logistic.pkl"
+          MODEL: "Logistic"
+        run: python src/label_data.py
+
+  upload-models:
+    runs-on: ubuntu-latest
+    needs: prep
+    steps:
+      - name: upload model
+        uses: actions/upload-artifact@v3
+        with:
+          name: data-storage
+          path: data/models/

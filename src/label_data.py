@@ -4,9 +4,10 @@ from sklearn import preprocessing
 import os
 import pickle
 
-dataname = os.environ.get("DATA")
-saveto = os.environ.get("FEATURES")
-model = os.environ.get("LABELER")
+dataname = os.environ.get("DATA",  default="data/data-storage/results.csv")
+model = os.environ.get("LABELER", default="data/models/label_encoder.pkl")
+train_name = os.environ.get("TRAIN_DATA", default="data/features/train.csv")
+test_name = os.environ.get("TEST_DATA", default="data/features/test.csv")
 
 df = pd.read_csv(dataname)
 del df['Year']
@@ -27,5 +28,5 @@ with open(model, 'wb') as f:
     pickle.dump(le, f)
 
 df_copy, test = sklearn.model_selection.train_test_split(df, train_size=0.85, shuffle=False)
-df_copy.to_csv(saveto+'train.csv')
-test.to_csv(saveto+'test.csv')
+df_copy.to_csv(train_name)
+test.to_csv(test_name)
