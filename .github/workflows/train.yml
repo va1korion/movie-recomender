@@ -41,5 +41,5 @@ jobs:
       - name: upload model
         uses: actions/upload-artifact@v3
         with:
-          name: features
+          name: models
           path: data/models/
