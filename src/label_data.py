@@ -26,4 +26,6 @@ for column_name in df.columns:
 with open(model, 'wb') as f:
     pickle.dump(le, f)
 
-df.to_csv(saveto+'data.csv')
+df_copy, test = sklearn.model_selection.train_test_split(df, train_size=0.85, shuffle=False)
+df_copy.to_csv(saveto+'train.csv')
+test.to_csv(saveto+'test.csv')
