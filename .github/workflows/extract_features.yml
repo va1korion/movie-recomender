@@ -13,7 +13,7 @@ jobs:
             name: data-storage
             path: data/data-storage/
       - name: prep dir
-        run: mkdir data/models && mkdir data/features
+        run: mkdir data/models && mkdir data/features && ls data && ls data/data-storage
       - name: install requirements
         run: pip install -r deps/preprocessing.txt
       - name: run script
