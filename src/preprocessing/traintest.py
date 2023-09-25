@@ -9,7 +9,7 @@ from rfpimp import permutation_importances
 import pandas as pd
 from datetime import datetime
 
-df = pd.read_csv('ratings.csv')
+df = pd.read_csv('../../data/data-storage/ratings.csv')
 del df['Year']
 del df['URL']
 del df['Const']
