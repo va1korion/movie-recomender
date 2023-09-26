@@ -6,7 +6,7 @@ import os
 import pickle
 
 dataname = os.environ.get("DATA",  default="data/data-storage/ratings.csv")
-model = os.environ.get("LABELER", default="data/preprocessing/")
+model = os.environ.get("LABELERS", default="data/preprocessing/")
 train_name = os.environ.get("TRAIN_DATA", default="data/features/train.csv")
 test_name = os.environ.get("TEST_DATA", default="data/features/test.csv")
 
