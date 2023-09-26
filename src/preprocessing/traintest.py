@@ -9,7 +9,7 @@ from rfpimp import permutation_importances
 import pandas as pd
 from datetime import datetime
 
-df = pd.read_csv('../../data/data-storage/ratings.csv')
+df = pd.read_csv('src/preprocessing/ratings.csv')
 del df['Year']
 del df['URL']
 del df['Const']
@@ -23,7 +23,7 @@ for column_name in df.columns:
         df[column_name] = pd.to_datetime(df[column_name], format='ISO8601')
         df[column_name] = sklearn.preprocessing.minmax_scale(df[column_name])
 
-
+print(df.describe())
 df_copy, test = sklearn.model_selection.train_test_split(df, train_size=0.85, shuffle=True)
 
 y_train = df_copy['Your Rating']

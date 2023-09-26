@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 import uvicorn
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
@@ -7,10 +9,15 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import HTMLResponse, FileResponse, PlainTextResponse, RedirectResponse
 import logging
 import pickle
+import json
 
-model = os.getenv("MODEL")
-le = os.getenv("LABELER")
-__version__ = "0.6.1"
+
+model = os.getenv("MODEL", default="data/models/best_model.pkl")
+le = os.getenv("LABELER", default="data/preprocessing/label_encoder.pkl")
+mm = os.getenv("MINMAX", default="data/preprocessing/minmaxer.pkl")
+__version__ = "0.6.5"
+
+
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="api/static"), name="static")
 templates = Jinja2Templates(directory="api/static")
@@ -20,6 +27,9 @@ with open(model, 'rb') as f:
 
 with open(le, 'rb') as f:
     labeler = pickle.load(f)
+
+with open(mm, 'rb') as f:
+    minmax = pickle.load(f)
 
 
 @app.get("/hello", response_class=PlainTextResponse)
@@ -52,15 +62,29 @@ async def read_index(request: Request):
 
 @app.post("/infer", response_class=PlainTextResponse)
 async def infer(request: Request):
-    json = await request.json()
-    data = pd.read_json(json)
-    labeled = labeler.predict(data)
-    prediction = regressor.predict(labeled)
+    j = await request.json()
+    df = pd.DataFrame([j])
+    df.fillna(0)
+    for column_name in df.columns:
+        print(column_name)
+        if column_name in ['Directors', 'Genres', 'Title Type', 'Title']:
+            try:
+                df[column_name] = labeler.transform(df[column_name])
+            except ValueError:
+                df[column_name] = pd.Series([0])
+        if column_name in ['Date Rated', 'Release Date']:
+            df[column_name] = pd.to_datetime(df[column_name], format='ISO8601')
+            df[column_name] = minmax.transform(np.array(df[column_name]).reshape(1, -1))
+
+    df['Unnamed: 0'] = pd.Series([0])
+    names = regressor.feature_names_in_
+    df = df[names]
+    prediction = regressor.predict(df)
     context = {
         "request": request,
         "version": __version__,
     }
-    return PlainTextResponse(prediction)
+    return PlainTextResponse(str(prediction))
 
 
 if __name__ == "__main__":
