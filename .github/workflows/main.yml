@@ -154,5 +154,5 @@ jobs:
           LABELER: "../data/preprocessing/label_encoder.pkl"
           MINMAX: "../data/preprocessing/minmaxer.pkl"
           MODEL: "../data/models/best_model.pkl"
-        run: cd api && gunicorn app:app --workers 1 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+        run: cd api && python app.py
 
