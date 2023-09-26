@@ -9,7 +9,6 @@ jobs:
       - name: download models
         uses: dawidd6/action-download-artifact@v2
         with:
-            workflow: train.yml
             name: models
             path: data/models/
       - name: download features
