@@ -49,9 +49,12 @@ jobs:
         with:
           workflow: extract_features.yml
           name: labeler
-          path: data/label_encoder.pkl
+          path: data
       - name: install requirements
         run: pip install -r deps/prod.txt
       - name: start app
+        env:
+          LABELER: "data/label_encoder.pkl"
+          MODEL: "data/models/best_model.pkl"
         run: python3.11 api/api.py
 

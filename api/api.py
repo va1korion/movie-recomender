@@ -1,15 +1,20 @@
 import os
-
+import pandas as pd
 import uvicorn
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from starlette.responses import HTMLResponse, FileResponse, PlainTextResponse, RedirectResponse
 import logging
 import pickle
 
 model = os.getenv("MODEL")
-le= os.getenv("LABELER")
+le = os.getenv("LABELER")
 __version__ = "0.6.0"
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="static")
+
 with open(model, 'rb') as f:
     regressor = pickle.load(f)
 
@@ -42,16 +47,20 @@ async def read_index(request: Request):
         "request": request,
         "version": __version__,
     }
-    return HTMLResponse()
+    return templates.TemplateResponse("index.html", context)
 
 
 @app.post("/infer", response_class=PlainTextResponse)
 async def infer(request: Request):
+    json = await request.json()
+    data = pd.read_json(json)
+    labeled = labeler.predict(data)
+    prediction = regressor.predict(labeled)
     context = {
         "request": request,
         "version": __version__,
     }
-    return PlainTextResponse()
+    return PlainTextResponse(prediction)
 
 
 if __name__ == "__main__":
