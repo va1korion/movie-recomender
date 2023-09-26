@@ -10,10 +10,10 @@ import pickle
 
 model = os.getenv("MODEL")
 le = os.getenv("LABELER")
-__version__ = "0.6.0"
+__version__ = "0.6.1"
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="static")
+app.mount("/static", StaticFiles(directory="api/static"), name="static")
+templates = Jinja2Templates(directory="api/static")
 
 with open(model, 'rb') as f:
     regressor = pickle.load(f)
