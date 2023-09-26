@@ -56,5 +56,5 @@ jobs:
         env:
           LABELER: "data/label_encoder.pkl"
           MODEL: "data/models/best_model.pkl"
-        run: python3.11 api/api.py
+        run: python3.11 api/app.py
 

@@ -12,15 +12,15 @@ import pickle
 import json
 
 
-model = os.getenv("MODEL", default="data/models/best_model.pkl")
-le = os.getenv("LABELER", default="data/preprocessing/label_encoder.pkl")
-mm = os.getenv("MINMAX", default="data/preprocessing/minmaxer.pkl")
+model = os.getenv("MODEL", default="../data/models/best_model.pkl")
+le = os.getenv("LABELER", default="../data/preprocessing/label_encoder.pkl")
+mm = os.getenv("MINMAX", default="../data/preprocessing/minmaxer.pkl")
 __version__ = "0.6.5"
 
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="api/static"), name="static")
-templates = Jinja2Templates(directory="api/static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="static")
 
 with open(model, 'rb') as f:
     regressor = pickle.load(f)
@@ -30,6 +30,19 @@ with open(le, 'rb') as f:
 
 with open(mm, 'rb') as f:
     minmax = pickle.load(f)
+
+
+@app.on_event('startup')
+async def load_models():
+    global regressor, labeler, minmax
+    with open(model, 'rb') as f:
+        regressor = pickle.load(f)
+
+    with open(le, 'rb') as f:
+        labeler = pickle.load(f)
+
+    with open(mm, 'rb') as f:
+        minmax = pickle.load(f)
 
 
 @app.get("/hello", response_class=PlainTextResponse)
