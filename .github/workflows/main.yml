@@ -25,7 +25,7 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v3
       - name: download
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: data-storage
           path: data/data-storage/
@@ -63,7 +63,7 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v3
       - name: download features
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: features
           path: data/features/
@@ -106,12 +106,12 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v3
       - name: download models
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: models
           path: data/models/
       - name: download features
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: features
           path: data/features/
@@ -136,12 +136,12 @@ jobs:
       - name: checkout repo content
         uses: actions/checkout@v3
       - name: download models
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: models
           path: data/models/
       - name: download labeler
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifacts@v3
         with:
           name: labeler
           path: data
