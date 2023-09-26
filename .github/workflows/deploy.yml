@@ -50,6 +50,8 @@ jobs:
           workflow: extract_features.yml
           name: labeler
           path: data
+      - name: check download
+        run: ls data/models && echo "" && ls data
       - name: install requirements
         run: pip install -r deps/prod.txt
       - name: start app
