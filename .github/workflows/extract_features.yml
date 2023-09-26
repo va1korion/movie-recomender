@@ -21,7 +21,7 @@ jobs:
           DATA: "data/data-storage/ratings.csv"
           TRAIN_DATA: "data/features/train.csv"
           TEST_DATA: "data/features/test.csv"
-          LABELER: "data/models/label_encoder.pkl"
+          LABELER: "data/label_encoder.pkl"
         run: python src/label_data.py
       - name: upload features
         uses: actions/upload-artifact@v3
@@ -33,3 +33,8 @@ jobs:
         with:
           name: models
           path: data/models/
+      - name: upload labeler
+        uses: actions/upload-artifact@v3
+        with:
+          name: labeler
+          path: data/label_encoder.pkl
