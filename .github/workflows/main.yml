@@ -1,5 +1,5 @@
-name: Dataset fetching & preprocessing
-on: [workflow_dispatch]
+name: Full pipeline
+on: [workflow_dispatch, push]
 jobs:
   dataset-fetch:
     runs-on: ubuntu-latest
@@ -18,12 +18,139 @@ jobs:
           path: data/data-storage/
 
 
-
-  dataset-label:
+  extract:
     runs-on: ubuntu-latest
     needs: dataset-fetch
     steps:
       - name: checkout repo content
         uses: actions/checkout@v3
+      - name: download
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: data-storage
+          path: data/data-storage/
+      - name: prep dir
+        run: mkdir data/models && mkdir data/features && ls data && ls data/data-storage
       - name: install requirements
         run: pip install -r deps/preprocessing.txt
+      - name: run script
+        env:
+          DATA: "data/data-storage/ratings.csv"
+          TRAIN_DATA: "data/features/train.csv"
+          TEST_DATA: "data/features/test.csv"
+          LABELER: "data/label_encoder.pkl"
+        run: python src/label_data.py
+      - name: upload features
+        uses: actions/upload-artifact@v3
+        with:
+          name: features
+          path: data/features/
+      - name: upload model
+        uses: actions/upload-artifact@v3
+        with:
+          name: models
+          path: data/models/
+      - name: upload labeler
+        uses: actions/upload-artifact@v3
+        with:
+          name: labeler
+          path: data/label_encoder.pkl
+
+  train:
+    runs-on: ubuntu-latest
+    needs: extract
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: download features
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: features
+          path: data/features/
+      - name: prep dir
+        run: mkdir data/models
+      - name: install requirements
+        run: pip install -r deps/preprocessing.txt
+
+      - name: train Random Forest
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/forest.pkl"
+          MODEL: "RandomForest"
+        run: python src/train.py
+
+      - name: train MLP
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/MLP.pkl"
+          MODEL: "MLP"
+        run: python src/train.py
+
+      - name: train logistic regression
+        env:
+          TRAIN_DATA: "data/features/train.csv"
+          MODEL_ARTIFACT: "data/models/logistic.pkl"
+          MODEL: "Logistic"
+        run: python src/train.py
+
+      - name: upload model
+        uses: actions/upload-artifact@v3
+        with:
+          name: models
+          path: data/models/
+
+  eval:
+    runs-on: ubuntu-latest
+    needs: train
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: download models
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: models
+          path: data/models/
+      - name: download features
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: features
+          path: data/features/
+      - name: install requirements
+        run: pip install -r deps/preprocessing.txt
+      - name: run eval
+        env:
+          TEST_DATA: "data/features/train.csv"
+          MODELS: "data/models"
+          OPTMAL_MODEL: "data/models/best_model.pkl"
+        run: python src/eval.py
+      - name: save to storage
+        uses: actions/upload-artifact@v3
+        with:
+          name: models
+          path: data/models
+
+  deploy:
+    runs-on: self-hosted
+    needs: eval
+    steps:
+      - name: checkout repo content
+        uses: actions/checkout@v3
+      - name: download models
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: models
+          path: data/models/
+      - name: download labeler
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: labeler
+          path: data
+      - name: check download
+        run: ls data/models && echo "" && ls data
+      - name: install requirements
+        run: pip install -r deps/prod.txt
+      - name: start app
+        env:
+          LABELER: "data/label_encoder.pkl"
+          MODEL: "data/models/best_model.pkl"
+        run: python3.11 api/api.py
